@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	maxConcurrentRequests = 10  // Limit of concurrent requests
-	totalRequests         = 100 // Total number of requests
+	maxConcurrentRequests = 10 // Limit of concurrent requests
+	// totalRequests         = 100 // Total number of requests
 )
 
 var http_client *http.Client
@@ -80,6 +80,7 @@ func main() {
 
 	var wg sync.WaitGroup
 	channelSemaphore := make(chan struct{}, maxConcurrentRequests)
+	start := time.Now()
 
 	buff, err := os.ReadFile("./80.txt")
 	if err != nil {
@@ -99,5 +100,8 @@ func main() {
 
 		go sendRequest(ip, 80, &wg, channelSemaphore)
 	}
-	wg.Wait() // Wait for all goroutines to finish
+	wg.Wait()
+
+	elapsed := time.Since(start)
+	fmt.Printf("All requests completed in %v\n", elapsed)
 }
