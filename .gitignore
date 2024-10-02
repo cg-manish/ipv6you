@@ -1,0 +1,4 @@
+*.html
+.DS_STORE
+*.csv
+*.txt
