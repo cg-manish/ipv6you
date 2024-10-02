@@ -22,7 +22,7 @@ func init() {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	http_client = &http.Client{Transport: transport, Timeout: 2 * time.Second}
+	http_client = &http.Client{Transport: transport, Timeout: 3 * time.Second}
 }
 
 func convertIpToFileName(ip string) string {
