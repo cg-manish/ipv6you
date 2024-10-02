@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	maxConcurrentRequests = 10 // Limit of concurrent requests
+	maxConcurrentRequests = 300 // Limit of concurrent requests
 	// totalRequests         = 100 // Total number of requests
 )
 
