@@ -33,7 +33,7 @@ func convertFileNameToIP(filename string) string {
 	return strings.Replace(filename, "-", ":", -1)
 }
 
-func sendRequest(ip string, port int, wg *sync.WaitGroup, channelSemaphore chan struct{}) {
+func sendRequest(ip string, port int, wg *sync.WaitGroup, channelSemaphore chan struct{}, outputFile *os.File) {
 	defer wg.Done()
 	defer func() { <-channelSemaphore }()
 
@@ -71,9 +71,9 @@ func sendRequest(ip string, port int, wg *sync.WaitGroup, channelSemaphore chan 
 	// write to csv file with ip ,status and port
 	csv_row := fmt.Sprintf("%s,%d,%d\n", ip, port, status_code)
 
-	// append to file
-	os.WriteFile("output.csv", []byte(csv_row), os.ModeAppend)
-
+	if _, err := outputFile.WriteString(csv_row); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func main() {
@@ -90,6 +90,17 @@ func main() {
 
 	ips := strings.Split(string(buff), "\n")
 
+	outputCSV, err := os.OpenFile("output.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+	defer outputCSV.Close()
+
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+
 	for _, ip := range ips {
 		if ip == "" {
 			continue
@@ -98,7 +109,7 @@ func main() {
 		channelSemaphore <- struct{}{} // add a semaphore to the channel
 		wg.Add(1)
 
-		go sendRequest(ip, 80, &wg, channelSemaphore)
+		go sendRequest(ip, 80, &wg, channelSemaphore, outputCSV)
 	}
 	wg.Wait()
 
